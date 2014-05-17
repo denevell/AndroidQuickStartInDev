@@ -1,6 +1,8 @@
 package org.denevell.AndroidProject.services;
 
-import org.denevell.AndroidProject.services.MessageBusService.GetResult;
+import org.denevell.AndroidProject.networking.ErrorResponse;
+import org.denevell.AndroidProject.networking.MessageBusService;
+import org.denevell.AndroidProject.networking.MessageBusService.GetResult;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package org.denevell.AndroidProject.services;
+package org.denevell.AndroidProject.networking;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -23,16 +23,6 @@ public class MessageBusService<ReturnResult, ServiceClass> {
         public abstract ReturnResult getResult(ServiceClass mService);
     }
 
-    public static class ReturnResultAndOptionalError<ReturnResult> {
-        public ReturnResult returnResult;
-        public ErrorResponse errorResponse;
-
-        private ReturnResultAndOptionalError(ReturnResult returnResult, ErrorResponse errorResponse) {
-            this.returnResult = returnResult;
-            this.errorResponse = errorResponse;
-        }
-    }
-
     public void fetch(String endPoint,
                      Class<ServiceClass> serviceClass,
                      ErrorResponse errorResponse,
@@ -40,31 +30,36 @@ public class MessageBusService<ReturnResult, ServiceClass> {
         fetch(endPoint, serviceClass, errorResponse, new GsonConverter(new Gson()), getResult);
     }
 
-    public void fetch(String endPoint,
+    public void fetch(final String endPoint,
                       Class<ServiceClass> serviceClass,
                       final ErrorResponse errorResponse,
                       Converter converter,
                       final GetResult<ReturnResult, ServiceClass> getResult) {
 
         // Create the Retrofit adapter based on the service class
-        RestAdapter mRestAdapter = new RestAdapter.Builder()
+        final RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint(endPoint)
                 .setConverter(converter)
                 .build();
-        final ServiceClass service = mRestAdapter.create(serviceClass);
+        final ServiceClass service = restAdapter.create(serviceClass);
 
         // Call the service in an async task, sending the success or error to the event bus
-        new AsyncTask<Void, Void, ReturnResultAndOptionalError>() {
+        new AsyncTask<Void, Void, ReturnResult>() {
             @Override
-            protected ReturnResultAndOptionalError doInBackground(Void... params) {
+            protected ReturnResult doInBackground(Void... params) {
                 try {
+                    Log.d(TAG, "Attempting to fetch result from base url: " + endPoint);
                     ReturnResult res = getResult.getResult(service);
-                    return new ReturnResultAndOptionalError(res, null);
+                    if(res!=null) {
+                        Log.d(TAG, "Fetched : " + res.toString() + " from " + endPoint);
+                    }
+                    return res;
                 } catch (RetrofitError e) {
                     errorResponse.fill(e.getResponse().getStatus(),
                                        e.getResponse().getReason(),
-                                       e.getResponse().getUrl());
-                    return new ReturnResultAndOptionalError(null, errorResponse);
+                                       e.getResponse().getUrl(),
+                                       e.isNetworkError());
+                    return null;
                 } catch(Exception e1) {
                     Log.e(TAG, "Unknown error", e1);
                     return null;
@@ -72,12 +67,12 @@ public class MessageBusService<ReturnResult, ServiceClass> {
             }
 
             @Override
-            protected void onPostExecute(ReturnResultAndOptionalError res) {
-                if(res!=null && res.returnResult!=null) {
+            protected void onPostExecute(ReturnResult res) {
+                if(res!=null) {
                     super.onPostExecute(res);
-                    Application.getEventBus().post(res.returnResult);
-                }  else if(res!=null && res.errorResponse!=null) {
-                    Application.getEventBus().post(res.errorResponse);
+                    Application.getEventBus().post(res);
+                }  else if(res==null && errorResponse!=null) {
+                    Application.getEventBus().post(errorResponse);
                 }
             }
         }.execute();

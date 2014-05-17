@@ -1,5 +1,7 @@
 package org.denevell.AndroidProject.services;
 
+import org.denevell.AndroidProject.networking.ErrorResponse;
+import org.denevell.AndroidProject.networking.MessageBusService;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
@@ -30,7 +32,7 @@ public class XmlTestService {
     }
 
     public static interface XmlServiceInterface {
-        @GET("/xml.xml")
+        @GET("/xml1.xml")
         Hi list();
     }
 

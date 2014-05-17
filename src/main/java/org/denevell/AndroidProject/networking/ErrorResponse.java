@@ -1,14 +1,16 @@
-package org.denevell.AndroidProject.services;
+package org.denevell.AndroidProject.networking;
 
 public class ErrorResponse {
     public int responseCode;
     public String responseMessage;
     public String url;
+    public boolean isNetworkError;
 
-    public void fill(int httpCode, String errorMessage, String url) {
+    public void fill(int httpCode, String errorMessage, String url, boolean isNetworkError) {
        this.responseCode = httpCode;
        this.responseMessage = errorMessage;
        this.url = url;
+       this.isNetworkError = isNetworkError;
     }
 
     public int getResponseCode() {
