@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="id" name="section_one_fragment" />
+    <item type="id" name="section_two_fragment" />
+    <item type="id" name="section_three_fragment" />
+</resources>

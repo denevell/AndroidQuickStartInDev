@@ -1,0 +1,17 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/custom_view_relativelayout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+
+    <CheckBox
+        android:id="@+id/custom_view_checkbox"
+        android:checked="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:text="@string/custom_view_checkbox_text" />
+
+</RelativeLayout>
